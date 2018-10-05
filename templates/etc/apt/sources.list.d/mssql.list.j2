@@ -1,0 +1,7 @@
+deb [arch=amd64] https://packages.microsoft.com/debian/{{ ansible_distribution_version[:1] }}/prod {{ ansible_distribution_release }} main
+# Workaround, waiting for msodbcsql in version 17 be restored for Debian stretch in microsoft repository
+# https://docs.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server
+# https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server
+# https://emacstragic.net/2017/11/06/mssql-odbc-client-on-debian-9-stretch/
+# We use version 13 from Debian Jessie everywhere, libssl1.0.0 dependency has been builded for stretch and pushed to ABL repository
+deb [arch=amd64] https://packages.microsoft.com/debian/8/prod jessie main
