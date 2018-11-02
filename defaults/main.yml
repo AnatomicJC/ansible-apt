@@ -16,17 +16,26 @@ apt_cache_update: "yes"
 apt_cache_valid_time: "3600"
 apt_main_url: "deb.debian.org"
 apt_keys: []
-#  - hwraid.le-vert.net.gpg.key
-#  - mysql.gpg.key
-#  - nodesource.gpg.key
-#  - mssql.gpg.key
+# Example:
+# apt_hwraid_keys:
+#  - name: hwraid
+#    content: |
+#      Put here the GPG public key
+# apt_docker_keys: []
+# apt_custom_keys: []
+# apt_keys: "{{ apt_hwraid_keys + apt_docker_keys + apt_custom_keys }}"
+
+apt_custom_sources_list: []
+# Example:
+# apt_hwraid_sources:
+#  - dest: "hwraid.list"
+#    content: |
+#      deb http://hwraid.le-vert.net/debian {{ ansible_distribution_release }} main
+# apt_docker_sources: []
+# apt_custom_sources: []
+# apt_custom_sources_list: "{{ apt_hwraid_sources + apt_docker_sources +apt_custom_sources }}"
 
 apt_sources_list:
   - main
   - security
-#  - hwraid
-#  - backports
-#  - proxmox
-#  - mysql.5.7
-#  - nodesource
-#  - mssql
+  - backports

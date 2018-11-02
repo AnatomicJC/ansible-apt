@@ -20,20 +20,17 @@
 
 - name: Add ssl dependencies
   apt:
-    name: "{{ item }}"
+    name: ['apt-transport-https', 'ca-certificates', 'ssl-cert']
     update_cache: "{{ apt_cache_update }}"
     cache_valid_time: "{{ apt_cache_valid_time }}"
     state: latest
-  with_items:
-    - apt-transport-https
-    - ca-certificates
-    - ssl-cert
 
 - name: Add apt keys
   apt_key:
-    data: "{{ lookup('file', 'etc/apt/keys/{{ item }}') }}"
+    data: "{{ item.content }}"
     state: present
   with_items: "{{ apt_keys }}"
+  no_log: True
 
 - name: Allow expired GPG key workaround
   copy:
@@ -50,7 +47,7 @@
     state: absent
   when: not apt_allow_unauthenticated
 
-- name: Configure sources.list
+- name: Remove sources.list file
   file:
     path: "{{ item.path }}"
     state: "{{ item.state }}"
@@ -59,22 +56,33 @@
       state: absent
     - path: /etc/apt/sources.list~
       state: absent
+    - path: /etc/apt/sources.list.save
+      state: absent
     - path: /etc/apt/sources.list.d
       state: directory
   tags: apt-sources-list-config
 
-- name: Configure HTTP sources.list
+- name: Create sources.list.d main files
   template:
     src: "etc/apt/sources.list.d/{{ item }}.list.j2"
     dest: "/etc/apt/sources.list.d/{{ item }}.list"
   with_items: "{{ apt_sources_list }}"
-  register: result
+  register: main
   tags: apt-sources-list-config
+
+- name: Create sources.list.d custom files
+  copy:
+    dest: "/etc/apt/sources.list.d/{{ item.dest }}"
+    content: "{{ item.content }}"
+  with_items: "{{ apt_custom_sources_list }}"
+  register: custom
+  tags: apt-sources-list-config
+
 
 - name: Update apt
   apt:
     update_cache: "yes"
-  when: result.changed
+  when: main.changed or custom.changed
   tags: apt-sources-list-config
 
 - name: Install eatmydata package
