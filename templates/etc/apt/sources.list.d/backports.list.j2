@@ -1,1 +1,5 @@
+{% if ansible_distribution == 'Debian' %}
 deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main
+{% elif ansible_distribution == 'Ubuntu' %}
+deb mirror://mirrors.ubuntu.com/mirrors.txt {{ ansible_distribution_release }}-backports main restricted universe multiverse
+{% endif %}
