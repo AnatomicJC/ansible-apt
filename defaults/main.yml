@@ -35,6 +35,7 @@ apt_custom_sources_list: []
 # apt_custom_sources: []
 # apt_custom_sources_list: "{{ apt_hwraid_sources + apt_docker_sources +apt_custom_sources }}"
 
+apt_custom_packages_list: []
 apt_sources_list:
   - main
   - security

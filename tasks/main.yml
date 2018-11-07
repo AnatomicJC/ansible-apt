@@ -78,12 +78,16 @@
   register: custom
   tags: apt-sources-list-config
 
-
 - name: Update apt
   apt:
     update_cache: "yes"
   when: main.changed or custom.changed
   tags: apt-sources-list-config
+
+- name: Install some custom packages
+  apt:
+    name: "{{ apt_custom_packages_list }}"
+    state: latest
 
 - name: Install eatmydata package
   apt:
