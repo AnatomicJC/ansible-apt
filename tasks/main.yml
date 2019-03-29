@@ -5,6 +5,13 @@
     state: absent
   with_items: "{{ apt_clean_old_config_files }}"
 
+- name: handle Debian backports expired inRelease for old distros
+  copy:
+    content: |
+      Acquire::Check-Valid-Until "0";
+    dest: '/etc/apt/apt.conf.d/99backports'
+  when: ansible_distribution == 'Debian' and ansible_distribution_major_version <= '8'
+
 - name: Configure /etc/apt/preferences.d/ files
   copy:
     dest: "{{ item.dest }}"

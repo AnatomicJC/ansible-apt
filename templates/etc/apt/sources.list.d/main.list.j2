@@ -1,6 +1,8 @@
-{% if ansible_distribution == 'Debian' %}
+{% if ansible_distribution == 'Debian' and ansible_distribution_major_version >= '9' %}
 deb https://{{ apt_main_url }}/debian {{ ansible_distribution_release }} main contrib non-free
 deb https://{{ apt_main_url }}/debian {{ ansible_distribution_release }}-updates main contrib non-free
+{% elif ansible_distribution == 'Debian' and ansible_distribution_major_version <= '8' %}
+deb http://archive.debian.org/debian {{ ansible_distribution_release }} main contrib non-free
 {% elif ansible_distribution == 'Ubuntu' %}
 deb mirror://mirrors.ubuntu.com/mirrors.txt {{ ansible_distribution_release }} main restricted universe multiverse
 deb mirror://mirrors.ubuntu.com/mirrors.txt {{ ansible_distribution_release }}-updates main restricted universe multiverse
