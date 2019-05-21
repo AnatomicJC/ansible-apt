@@ -17,13 +17,13 @@
     dest: "{{ item.dest }}"
     content: "{{ item.content }}"
   with_items: "{{ apt_preferences }}"
-  when: apt_preferences
+  when: apt_preferences|bool
 
 - name: Add 32-bit architecture
   copy:
     content: "amd64\ni386\n"
     dest: /var/lib/dpkg/arch
-  when: apt_32_bit
+  when: apt_32_bit|bool
 
 - name: Add ssl dependencies
   apt:
@@ -46,13 +46,13 @@
       Acquire::AllowInsecureRepositories "true";
       Acquire::AllowDowngradeToInsecureRepositories "true";
     dest: /etc/apt/apt.conf.d/99allowUnauthenticated
-  when: apt_allow_unauthenticated
+  when: apt_allow_unauthenticated|bool
 
 - name: Be sure repo will be authenticated
   file:
     path: /etc/apt/apt.conf.d/99allowUnauthenticated
     state: absent
-  when: not apt_allow_unauthenticated
+  when: not apt_allow_unauthenticated|bool
 
 - name: Remove sources.list file
   file:
@@ -88,7 +88,7 @@
 - name: Update apt
   apt:
     update_cache: "yes"
-  when: main.changed or custom.changed
+  when: main.changed|bool or custom.changed|bool
   tags: apt-sources-list-config
 
 - name: Install some custom packages
@@ -100,7 +100,7 @@
   apt:
     name=eatmydata
     state=latest
-  when: apt_eatmydata
+  when: apt_eatmydata|bool
 
 - name: Configure eatmydata package
   file:
@@ -111,13 +111,13 @@
     - '/usr/local/bin/apt'
     - '/usr/local/bin/apt-get'
     - '/usr/local/bin/aptitude'
-  when: apt_eatmydata
+  when: apt_eatmydata|bool
 
 - name: Configure Squid proxy
   apt:
     name: squid-deb-proxy-client
     state: latest
-  when: apt_squid_proxy
+  when: apt_squid_proxy|bool
 
 - name: configure apt-proxy cache
   template:
