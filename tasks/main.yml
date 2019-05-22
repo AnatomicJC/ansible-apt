@@ -17,7 +17,7 @@
     dest: "{{ item.dest }}"
     content: "{{ item.content }}"
   with_items: "{{ apt_preferences }}"
-  when: apt_preferences|bool
+  when: apt_preferences|length > 0
 
 - name: Add 32-bit architecture
   copy:
