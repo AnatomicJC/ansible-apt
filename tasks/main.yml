@@ -30,7 +30,7 @@
     name: ['apt-transport-https', 'ca-certificates', 'ssl-cert']
     update_cache: "{{ apt_cache_update }}"
     cache_valid_time: "{{ apt_cache_valid_time }}"
-    state: latest
+    state: present
 
 - name: Add apt keys
   apt_key:
@@ -94,12 +94,12 @@
 - name: Install some custom packages
   apt:
     name: "{{ apt_custom_packages_list }}"
-    state: latest
+    state: present
 
 - name: Install eatmydata package
   apt:
-    name=eatmydata
-    state=latest
+    name: eatmydata
+    state: present
   when: apt_eatmydata|bool
 
 - name: Configure eatmydata package
@@ -116,7 +116,7 @@
 - name: Configure Squid proxy
   apt:
     name: squid-deb-proxy-client
-    state: latest
+    state: present
   when: apt_squid_proxy|bool
 
 - name: configure apt-proxy cache
