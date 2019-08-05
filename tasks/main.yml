@@ -74,22 +74,20 @@
     src: "etc/apt/sources.list.d/{{ item }}.list.j2"
     dest: "/etc/apt/sources.list.d/{{ item }}.list"
   with_items: "{{ apt_sources_list }}"
-  register: main
   tags: apt-sources-list-config
+  notify:
+    - apt update
 
 - name: Create sources.list.d custom files
   copy:
     dest: "/etc/apt/sources.list.d/{{ item.dest }}"
     content: "{{ item.content }}"
   with_items: "{{ apt_custom_sources_list }}"
-  register: custom
   tags: apt-sources-list-config
+  notify:
+    - apt update
 
-- name: Update apt
-  apt:
-    update_cache: "yes"
-  when: main.changed|bool or custom.changed|bool
-  tags: apt-sources-list-config
+- meta: flush_handlers
 
 - name: Install some custom packages
   apt:
