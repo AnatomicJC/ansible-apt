@@ -25,9 +25,13 @@
     dest: /var/lib/dpkg/arch
   when: apt_32_bit|bool
 
-- name: Add ssl dependencies
+- name: Add some needed dependencies (ssl / gpg)
   apt:
-    name: ['apt-transport-https', 'ca-certificates', 'ssl-cert']
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - ssl-cert
+      - gnupg
     update_cache: "{{ apt_cache_update }}"
     cache_valid_time: "{{ apt_cache_valid_time }}"
     state: present
