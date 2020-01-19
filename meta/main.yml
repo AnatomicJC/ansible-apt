@@ -1,7 +1,6 @@
 galaxy_info:
   description: Apt Configuration
-  author:
-  - Jean Christophe Vassort
+  author: "Jean Christophe Vassort"
   license: GPLv3
   min_ansible_version: 2.0
   platforms:
@@ -9,8 +8,12 @@ galaxy_info:
     versions:
     - xenial
     - yakkety
+    - bionic
+    - disco
   - name: Debian
     versions:
+    - buster
+    - stretch
     - jessie
     - wheezy
   galaxy-tags:
