@@ -1,0 +1,42 @@
+---
+- name: Install some custom packages
+  apt:
+    name: "{{ apt_custom_packages_list }}"
+    state: present
+  when: apt_custom_packages_list | difference(ansible_facts.packages)
+
+- name: Install eatmydata package
+  apt:
+    name: eatmydata
+    state: present
+  when:
+    - apt_eatmydata|bool
+    - "'eatmydata' not in ansible_facts.packages"
+
+- name: Configure eatmydata package
+  file:
+    src=/usr/bin/eatmydata
+    dest={{ item }}
+    state=link
+  loop:
+    - '/usr/local/bin/apt'
+    - '/usr/local/bin/apt-get'
+    - '/usr/local/bin/aptitude'
+  when:
+    - apt_eatmydata|bool
+
+- name: Configure Squid proxy
+  apt:
+    name: squid-deb-proxy-client
+    state: present
+  when:
+    - apt_squid_proxy|bool
+    - "'squid-deb-proxy-client' not in ansible_facts.packages"
+
+- name: configure apt-proxy cache
+  template:
+    src: 'etc/apt/apt.conf.d/99proxy.j2'
+    dest: '/etc/apt/apt.conf.d/99proxy'
+    owner: root
+    group: root
+    mode: 0644
