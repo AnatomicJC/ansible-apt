@@ -25,6 +25,7 @@ apt_keys: []
 # apt_custom_keys: []
 # apt_keys: "{{ apt_hwraid_keys + apt_docker_keys + apt_custom_keys }}"
 
+apt_play_custom_stuff: no
 apt_custom_sources_list: []
 # Example:
 # apt_hwraid_sources:

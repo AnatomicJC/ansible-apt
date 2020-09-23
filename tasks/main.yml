@@ -1,10 +1,16 @@
 ---
+- name: Update cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
 - name: Gather the package facts
   package_facts:
-    manager: auto
+    manager: apt
   when: ansible_facts.packages is not defined
 
 - import_tasks: 10-custom-stuff.yml
+  when: apt_play_custom_stuff
 
 - name: Configure /etc/apt/preferences.d/ files
   copy:
@@ -34,10 +40,13 @@
   when: apt_needed_packages | difference(ansible_facts.packages)
 
 - name: Add apt keys
-  apt_key:
-    data: "{{ item.content }}"
-    state: present
-  with_items: "{{ apt_keys }}"
+  copy:
+    content: "{{ item.content }}"
+    dest: "/etc/apt/trusted.gpg.d/{{ item.name }}.asc"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ apt_keys }}"
   no_log: True
 
 - name: Remove sources.list file
