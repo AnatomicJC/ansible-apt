@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: ansible_apt
   description: Apt Configuration
   author: "Jean Christophe Vassort"
   license: GPLv3
