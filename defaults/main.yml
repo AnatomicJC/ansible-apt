@@ -35,6 +35,11 @@ apt_custom_sources_list: []
 # apt_custom_sources: []
 # apt_custom_sources_list: "{{ apt_hwraid_sources + apt_docker_sources +apt_custom_sources }}"
 
+apt_needed_packages:
+  - apt-transport-https
+  - ca-certificates
+  - ssl-cert
+  - gnupg
 apt_custom_packages_list: []
 apt_sources_list:
   - main

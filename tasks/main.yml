@@ -1,4 +1,9 @@
 ---
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+  when: ansible_facts.packages is not defined
+
 - name: Cleaning old config files
   file:
     path: "{{ item }}"
@@ -10,12 +15,18 @@
     content: |
       Acquire::Check-Valid-Until "0";
     dest: '/etc/apt/apt.conf.d/99backports'
+    owner: root
+    group: root
+    mode: 0644
   when: ansible_distribution == 'Debian' and ansible_distribution_major_version|int <= 8
 
 - name: Configure /etc/apt/preferences.d/ files
   copy:
     dest: "{{ item.dest }}"
     content: "{{ item.content }}"
+    owner: root
+    group: root
+    mode: 0644
   with_items: "{{ apt_preferences }}"
   when: apt_preferences|length > 0
 
@@ -23,18 +34,18 @@
   copy:
     content: "amd64\ni386\n"
     dest: /var/lib/dpkg/arch
+    owner: root
+    group: root
+    mode: 0644
   when: apt_32_bit|bool
 
 - name: Add some needed dependencies (ssl / gpg)
   apt:
-    name:
-      - apt-transport-https
-      - ca-certificates
-      - ssl-cert
-      - gnupg
+    name: "{{ apt_needed_packages }}"
     update_cache: "{{ apt_cache_update }}"
     cache_valid_time: "{{ apt_cache_valid_time }}"
     state: present
+  when: apt_needed_packages | difference(ansible_facts.packages)
 
 - name: Add apt keys
   apt_key:
@@ -50,6 +61,9 @@
       Acquire::AllowInsecureRepositories "true";
       Acquire::AllowDowngradeToInsecureRepositories "true";
     dest: /etc/apt/apt.conf.d/99allowUnauthenticated
+    owner: root
+    group: root
+    mode: 0644
   when: apt_allow_unauthenticated|bool
 
 - name: Be sure repo will be authenticated
@@ -62,6 +76,9 @@
   file:
     path: "{{ item.path }}"
     state: "{{ item.state }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode | 0644 }}"
   with_items:
     - path: /etc/apt/sources.list
       state: absent
@@ -71,12 +88,16 @@
       state: absent
     - path: /etc/apt/sources.list.d
       state: directory
+      mode: 0755
   tags: apt-sources-list-config
 
 - name: Create sources.list.d main files
   template:
     src: "etc/apt/sources.list.d/{{ item }}.list.j2"
     dest: "/etc/apt/sources.list.d/{{ item }}.list"
+    owner: root
+    group: root
+    mode: 0644
   with_items: "{{ apt_sources_list }}"
   tags: apt-sources-list-config
   notify:
@@ -86,6 +107,9 @@
   copy:
     dest: "/etc/apt/sources.list.d/{{ item.dest }}"
     content: "{{ item.content }}"
+    owner: root
+    group: root
+    mode: 0644
   with_items: "{{ apt_custom_sources_list }}"
   tags: apt-sources-list-config
   notify:
@@ -97,12 +121,15 @@
   apt:
     name: "{{ apt_custom_packages_list }}"
     state: present
+  when: apt_custom_packages_list | difference(ansible_facts.packages)
 
 - name: Install eatmydata package
   apt:
     name: eatmydata
     state: present
-  when: apt_eatmydata|bool
+  when:
+    - apt_eatmydata|bool
+    - "'eatmydata' not in ansible_facts.packages"
 
 - name: Configure eatmydata package
   file:
@@ -113,15 +140,21 @@
     - '/usr/local/bin/apt'
     - '/usr/local/bin/apt-get'
     - '/usr/local/bin/aptitude'
-  when: apt_eatmydata|bool
+  when:
+    - apt_eatmydata|bool
 
 - name: Configure Squid proxy
   apt:
     name: squid-deb-proxy-client
     state: present
-  when: apt_squid_proxy|bool
+  when:
+    - apt_squid_proxy|bool
+    - "'squid-deb-proxy-client' not in ansible_facts.packages"
 
 - name: configure apt-proxy cache
   template:
     src: 'etc/apt/apt.conf.d/99proxy.j2'
     dest: '/etc/apt/apt.conf.d/99proxy'
+    owner: root
+    group: root
+    mode: 0644
