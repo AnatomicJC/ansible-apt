@@ -4,21 +4,7 @@
     manager: auto
   when: ansible_facts.packages is not defined
 
-- name: Cleaning old config files
-  file:
-    path: "{{ item }}"
-    state: absent
-  loop: "{{ apt_clean_old_config_files }}"
-
-- name: handle Debian backports expired inRelease for old distros
-  copy:
-    content: |
-      Acquire::Check-Valid-Until "0";
-    dest: '/etc/apt/apt.conf.d/99backports'
-    owner: root
-    group: root
-    mode: 0644
-  when: ansible_distribution == 'Debian' and ansible_distribution_major_version|int <= 8
+- import_tasks: 10-custom-stuff.yml
 
 - name: Configure /etc/apt/preferences.d/ files
   copy:
@@ -53,24 +39,6 @@
     state: present
   with_items: "{{ apt_keys }}"
   no_log: True
-
-- name: Allow expired GPG key workaround
-  copy:
-    content: |
-      APT::Get::AllowUnauthenticated "true";
-      Acquire::AllowInsecureRepositories "true";
-      Acquire::AllowDowngradeToInsecureRepositories "true";
-    dest: /etc/apt/apt.conf.d/99allowUnauthenticated
-    owner: root
-    group: root
-    mode: 0644
-  when: apt_allow_unauthenticated|bool
-
-- name: Be sure repo will be authenticated
-  file:
-    path: /etc/apt/apt.conf.d/99allowUnauthenticated
-    state: absent
-  when: not apt_allow_unauthenticated|bool
 
 - name: Remove sources.list file
   file:
