@@ -8,7 +8,7 @@
   file:
     path: "{{ item }}"
     state: absent
-  with_items: "{{ apt_clean_old_config_files }}"
+  loop: "{{ apt_clean_old_config_files }}"
 
 - name: handle Debian backports expired inRelease for old distros
   copy:
@@ -78,7 +78,7 @@
     state: "{{ item.state }}"
     owner: root
     group: root
-    mode: "{{ item.mode | 0644 }}"
+    mode: "{{ item.mode | default(0644) }}"
   with_items:
     - path: /etc/apt/sources.list
       state: absent
@@ -88,7 +88,7 @@
       state: absent
     - path: /etc/apt/sources.list.d
       state: directory
-      mode: 0755
+      mode: "0755"
   tags: apt-sources-list-config
 
 - name: Create sources.list.d main files

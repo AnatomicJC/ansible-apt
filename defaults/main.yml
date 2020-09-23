@@ -4,7 +4,7 @@ apt_allow_unauthenticated: False
 apt_eatmydata: False
 apt_squid_proxy: False
 apt_preferences: []
-apt_clean_old_config_files: False
+apt_clean_old_config_files: []
 #  - dest: "/etc/apt/preferences.d/openssh"
 #    content: |
 #      Package: openssh-server openssh-client ssh
